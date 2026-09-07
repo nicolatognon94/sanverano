@@ -15,7 +15,7 @@ class Cp3000Vendor implements VendorInterface
         $phases = [];
         $energy_wh = 0;
         $door_open = 0;
-        $alarm = [];
+        $alarm = []; 
         foreach ($data as $part) {
             if(!str_contains($part, ':')) {
                 continue;

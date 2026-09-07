@@ -59,11 +59,11 @@ class MqttListen extends Command
         };
 
         $this->info('Connesso a MQTT!');
-        // $mqtt->subscribe(
-        //     'lumina/v2/sanverano/+/telemetry',
-        //     $callback,
-        //     0
-        // );
+        $mqtt->subscribe(
+            'lumina/v2/sanverano/+/telemetry',
+            $callback,
+            0
+        );
         
         $mqtt->subscribe(
             'cp3000/+/data',

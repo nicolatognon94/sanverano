@@ -23,5 +23,20 @@ class LightPoint extends Model
     public $incrementing = true;
     protected $keyType = 'int';
     public $timestamps = true;
-
+    public function cabinet()
+    {
+        return $this->belongsTo(Cabinet::class);
+    }
+     public function currentState()
+    {
+        return $this->hasOne(CurrentState::class);
+    }
+    public function alarms()
+    {
+        return $this->hasMany(Alarm::class);
+    }
+    public function pointReadings()
+    {
+        return $this->hasMany(PointReading::class);
+    }
 }

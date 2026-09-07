@@ -27,5 +27,12 @@ class PointReading extends Model
     public $incrementing = true;
     protected $keyType = 'int';
     public $timestamps = true;
+    protected $casts = [
+        'measured_at' => 'datetime',
+    ];
+    public function lightPoint()
+    {
+        return $this->belongsTo(LightPoint::class);
+    }
 
 }

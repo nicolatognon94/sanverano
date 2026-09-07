@@ -20,5 +20,9 @@ class CurrentState extends Model
     public $incrementing = true;
     protected $keyType = 'int';
     public $timestamps = true;
-
+    public function lightPoint()
+    {
+        return $this->belongsTo(LightPoint::class);
+    }
+   
 }

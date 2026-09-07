@@ -16,6 +16,7 @@ class CabinetReading extends Model
         'current_a',
         'power_w',
         'energy_wh',
+        'energy_delta_wh',
         'door_open',
         'ingested_at'
     ];
@@ -26,4 +27,7 @@ class CabinetReading extends Model
     protected $keyType = 'int';
     public $timestamps = true;
 
+    protected $casts = [
+        'measured_at' => 'datetime',
+    ];
 }

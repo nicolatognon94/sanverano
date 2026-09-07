@@ -6,6 +6,9 @@ use Illuminate\Support\ServiceProvider;
 use App\Services\Vendors\LuminaVendors;
 use App\Services\Vendors\Cp3000Vendor;
 use App\Services\VendorResolver;
+use App\Services\Commands\CommandSenderResolver;
+use App\Services\Commands\LuminaCommandSender;
+use App\Services\Commands\Cp3000CommandSender;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +22,12 @@ class AppServiceProvider extends ServiceProvider
             return new VendorResolver([
                 new LuminaVendors(),
                 new Cp3000Vendor(),
+            ]);
+        });
+         $this->app->singleton(CommandSenderResolver::class, function () {
+            return new CommandSenderResolver([
+                new LuminaCommandSender(),
+                new Cp3000CommandSender(),
             ]);
         });
     }
