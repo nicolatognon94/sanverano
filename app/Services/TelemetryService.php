@@ -61,7 +61,7 @@ class TelemetryService {
                         'last_seen_at'=>$receivedAt
                     ]
                 );
-
+                $this->reconcilePendingCommand($lightPoint, $data);
                 $this->handleAlarmsLightPoint($data['errors'] ?? [], $res->light_point_id, $measuredAt);
                 
             }
@@ -199,5 +199,34 @@ class TelemetryService {
             ->first();
 
         return $lastReading ? $lastReading->energy_wh : null;
+    }
+    private function reconcilePendingCommand(LightPoint $lightPoint, array $data)
+    {
+        $command = \App\Models\Command::where('asset_type', 'point')
+            ->where('asset_id', $lightPoint->id)
+            ->where('status', 'pending')
+            ->latest('requested_at')
+            ->first();
+
+        if (!$command) {
+            return;
+        }
+
+        $confirmed = match ($command->action) {
+            'on' => $data['relay_status'] === 'ON',
+            'off' => $data['relay_status'] === 'OFF',
+            'dim' => (int) $data['dimming_percent'] === (int) $command->target_value,
+            default => false,
+        };
+
+        if (!$confirmed) {
+            return;
+        }
+
+        $command->update([
+            'status' => 'acked',
+            'acked_at' => now()->utc(),
+            'ack_payload' => $data,
+        ]);
     }
 }

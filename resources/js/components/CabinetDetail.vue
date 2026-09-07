@@ -44,6 +44,40 @@
                             </div>
                         </div>
                     </div> 
+                    <button
+                            class="btn btn-success me-2"
+                            @click="sendCommand('on')"
+                        >
+                            Accendi
+                        </button>
+
+                        <button
+                            class="btn btn-danger"
+                            @click="sendCommand('off')"
+                        >
+                            Spegni
+                        </button>
+
+                      <div class="mt-3">
+                    <label for="dimming" class="form-label">
+                        Luminosità: {{ dimming }}%
+                    </label>
+
+                    <input
+                        id="dimming"
+                        type="range"
+                        class="form-range"
+                        min="0"
+                        max="100"
+                        v-model="dimming"
+                    >
+                    <button
+    class="btn btn-primary mt-2"
+    @click="sendCommand('dim', dimming)"
+>
+    Applica luminosità
+</button>
+                </div>  
                 </div>
                 <div class="row mt-4" v-if="cabinet?.cabinetStatusInfo">
                     <div class="col-3">
@@ -103,7 +137,7 @@ const cabinet = ref(null);
 const route = useRoute();
 const loading = ref(true);
 const error = ref(null);
-
+const dimming = ref(70);
 ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -164,5 +198,14 @@ const loadPower = async () => {
 
     chartData.value.datasets[0].data = Object.values(response.data);
 };
+const sendCommand = async (action, targetValue = null) => {
+    const response = await axios.post('/api/commands', {
+        asset_type: 'point',
+        asset_id: route.params.id,
+        action: action,
+        target_value: targetValue,
+    });
 
+    console.log(response.data);
+};
 </script>

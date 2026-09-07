@@ -25,6 +25,10 @@ return new class extends Migration
             $table->timestamp('ingested_at')->useCurrent();
             $table->timestamps();
             $table->index(['cabinet_id', 'line', 'measured_at']);
+            $table->unique(
+                ['cabinet_id', 'line', 'measured_at'],
+                'cabinet_line_measured_unique'
+            );
         });
     }
 
