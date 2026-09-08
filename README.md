@@ -40,6 +40,15 @@ npm run dev
 ```
 
 
+Controllo dello stato:
+
+Lo stato dei dispositivi viene aggiornato sulla base della ricezione delle telemetrie.
+
+Quando un dispositivo non invia telemetrie per un determinato intervallo di tempo, può essere considerato offline e il relativo stato viene aggiornato di conseguenza.
+
+La verifica dello stato offline viene effettuata tramite il campo last_seen_at salvato nella tabella current_states.
+
+
 ## Avvio dello starter kit
 
 Dalla directory `starter-kit`:

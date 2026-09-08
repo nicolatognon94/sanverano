@@ -11,6 +11,7 @@ use App\Models\Command;
 use Illuminate\Support\Str;
 use App\Services\Commands\CommandSenderResolver;
 use App\Models\LightPoint;
+use App\Models\PointReading;
 class CabinetController extends Controller{
     public function index(Request $request){
         $states = CurrentState::query()->get();
@@ -135,7 +136,7 @@ class CabinetController extends Controller{
         return response()->json($cabinetDetail);
     }
     public function power($cabinetId){ 
-        ini_set('memory_limit', '-1'); // da sistemare sta cosa 
+        // ini_set('memory_limit', '-1'); // da sistemare sta cosa 
         $cabinet = Cabinet::where('id', $cabinetId)->first();
         if(!$cabinet)    return response()->json([
             'message' => 'Cabinet not found',
@@ -143,25 +144,27 @@ class CabinetController extends Controller{
 
         $readings = array();
         if($cabinet->lot == 'C'){
-            $readings = CabinetReading::where('cabinet_id', $cabinet->id)->get();
-
-            $grouped = [];
-
-            foreach($readings as $reading){ 
-                $timestamp = $reading->measured_at->format('Y-m-d H:i:00');
-
-                $grouped[$timestamp] = ($grouped[$timestamp] ?? 0) + $reading->power_w;
-            }
-
-            $readings = $grouped;
+            $readings = CabinetReading::where('cabinet_id', $cabinet->id)
+                ->selectRaw("DATE_FORMAT(measured_at, '%Y-%m-%d %H:%i:00') as timestamp")
+                ->selectRaw('SUM(power_w) as power')
+                ->where('measured_at', '>=', now()->subHours(2)) // prendo le ultime 2 ore 
+                ->groupBy('timestamp')
+                ->orderBy('timestamp')
+                ->pluck('power', 'timestamp')
+                ->toArray();
         }
         if($cabinet->lot == 'A'){
-            foreach($cabinet->lightPoints as $lightPoint){
-                foreach($lightPoint->pointReadings as $reading){
-                    $timestamp = $reading->measured_at->format('Y-m-d H:i:00');
-                    $readings[$timestamp] = ($readings[$timestamp] ?? 0) + $reading->power_w;
-                }
-            }
+            $readings = PointReading::whereIn(
+                'light_point_id',
+                $cabinet->lightPoints->pluck('id')
+            )
+                ->where('measured_at', '>=', now()->subHours(2))
+                ->selectRaw("DATE_FORMAT(measured_at, '%Y-%m-%d %H:%i:00') as timestamp")
+                ->selectRaw('SUM(power_w) as power')
+                ->groupBy('timestamp')
+                ->orderBy('timestamp')
+                ->pluck('power', 'timestamp')
+                ->toArray();
         }
 
         return response()->json($readings);
