@@ -29,6 +29,8 @@ php artisan migrate
 
 Importare l'anagrafica dell'impianto:
 
+Mi raccomando, plant.csv dev'essere dentro storage/app/private
+
 ```bash
 php artisan app:import-plant
 ```
