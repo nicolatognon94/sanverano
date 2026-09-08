@@ -192,11 +192,17 @@ onMounted(async () => {
 const loadPower = async () => {
     const response = await axios.get('/api/cabinets/' + route.params.id + '/power');
 
-    chartData.value.labels = Object.keys(response.data).map(timestamp => {
-        return timestamp.substring(11, 16);
-    });
-
-    chartData.value.datasets[0].data = Object.values(response.data);
+    chartData.value = {
+        labels: Object.keys(response.data).map(timestamp => {
+            return timestamp.substring(11, 16);
+        }),
+        datasets: [
+            {
+                label: 'Potenza',
+                data: Object.values(response.data),
+            },
+        ],
+    };
 };
 const sendCommand = async (action, targetValue = null) => {
     const response = await axios.post('/api/commands', {
@@ -205,7 +211,6 @@ const sendCommand = async (action, targetValue = null) => {
         action: action,
         target_value: targetValue,
     });
-
-    console.log(response.data);
+ 
 };
 </script>
